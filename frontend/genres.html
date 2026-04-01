@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BingeBuddy — Pick Genres</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="favicon.ico" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="genres-screen">
+    <div class="genres-wrap">
+      <div class="genres-header">
+        <p class="genres-step">One last step</p>
+        <h1 class="genres-title">Pick Your Genres</h1>
+        <p class="genres-subtitle">
+          Choose at least 3 — we'll tailor your recommendations
+        </p>
+      </div>
+
+      <div class="genres-grid" id="genresGrid">
+        <div class="state-loading" style="grid-column: 1/-1">
+          <div class="spinner"></div>
+          Loading genres...
+        </div>
+      </div>
+
+      <p class="genres-count"><span id="count">0</span> genres selected</p>
+
+      <button class="btn-primary" id="saveBtn" onclick="saveGenres()" disabled>
+        Let's Go →
+      </button>
+    </div>
+
+    <div class="filmstrip"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/movies.js"></script>
+    <script>
+      requireAuth();
+
+      let selected = new Map();
+
+      async function loadGenres() {
+        const genres = await fetchGenres();
+        const grid = document.getElementById("genresGrid");
+        grid.innerHTML = "";
+        genres.forEach((g) => {
+          const chip = document.createElement("div");
+          chip.className = "genre-chip";
+          chip.textContent = g.name;
+          chip.onclick = () => toggleGenre(g, chip);
+          grid.appendChild(chip);
+        });
+      }
+
+      function toggleGenre(genre, chip) {
+        if (selected.has(genre.id)) {
+          selected.delete(genre.id);
+          chip.classList.remove("selected");
+        } else {
+          selected.set(genre.id, genre.name);
+          chip.classList.add("selected");
+        }
+        document.getElementById("count").textContent = selected.size;
+        document.getElementById("saveBtn").disabled = selected.size < 3;
+      }
+
+      async function saveGenres() {
+        const btn = document.getElementById("saveBtn");
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+
+        const genres = Array.from(selected.entries()).map(([id, name]) => ({
+          genre_id: id,
+          genre_name: name,
+        }));
+
+        const res = await fetch(`${API_BASE_URL}/user/genres`, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify(genres),
+        });
+
+        if (res.ok) {
+          window.location.href = "home.html";
+        } else {
+          btn.disabled = false;
+          btn.textContent = "Let's Go →";
+          alert("Something went wrong. Please try again.");
+        }
+      }
+
+      loadGenres();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BingeBuddy — Home</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="favicon.ico" />
+  </head>
+
+  <body class="app-screen">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">
+        <div class="navbar-brand-icon">
+          <img src="favicon.ico" alt="BingeBuddy icon" />
+        </div>
+        <span class="navbar-brand-name">BingeBuddy</span>
+      </a>
+
+      <div class="navbar-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search movies..." />
+      </div>
+
+      <div class="navbar-nav">
+        <button class="nav-tab active" onclick="showTab('home', this)">
+          Home
+        </button>
+        <button class="nav-tab" onclick="showTab('liked', this)">
+          ❤️ Liked
+        </button>
+        <button class="nav-tab" onclick="showTab('watchlist', this)">
+          🔖 Watchlist
+        </button>
+        <button class="nav-logout" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <!-- App Content -->
+    <main class="app-main">
+      <!-- Home Tab -->
+      <div id="homeTab">
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">🤖 <span>Recommended</span> For You</h2>
+            <span class="section-badge">Cosine Similarity</span>
+          </div>
+          <div class="movies-grid" id="recommendGrid">
+            <div class="state-loading">
+              <div class="spinner"></div>
+              Finding your matches...
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">🔥 <span>Trending</span> This Week</h2>
+          </div>
+          <div class="movies-grid" id="trendingGrid">
+            <div class="state-loading">
+              <div class="spinner"></div>
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Tab -->
+      <div id="searchTab" style="display: none">
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">🔍 Search <span>Results</span></h2>
+          </div>
+          <div class="movies-grid" id="searchGrid"></div>
+        </div>
+      </div>
+
+      <!-- Liked Tab -->
+      <div id="likedTab" style="display: none">
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">❤️ <span>Liked</span> Movies</h2>
+          </div>
+          <div class="movies-grid" id="likedGrid">
+            <div class="state-loading">
+              <div class="spinner"></div>
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watchlist Tab -->
+      <div id="watchlistTab" style="display: none">
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">🔖 My <span>Watchlist</span></h2>
+          </div>
+          <div class="movies-grid" id="watchlistGrid">
+            <div class="state-loading">
+              <div class="spinner"></div>
+              Loading...
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="filmstrip"></div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/movies.js"></script>
+    <script>
+      requireAuth();
+
+      let likedIds = new Set();
+
+      async function init() {
+        try {
+          // Fetch liked movies first to populate likedIds before rendering cards
+          const liked = await fetchLiked();
+          liked.forEach((m) => likedIds.add(m.tmdb_movie_id));
+        } catch (e) {
+          console.error("Failed to fetch liked movies on init:", e);
+        }
+
+        // Then load others in parallel
+        loadTrending();
+        loadRecommendations();
+      }
+
+      async function loadTrending() {
+        const grid = document.getElementById("trendingGrid");
+        try {
+          const movies = await fetchTrending();
+          grid.innerHTML = "";
+          movies.forEach((m) =>
+            grid.appendChild(createMovieCard(m, likedIds.has(m.tmdb_id))),
+          );
+        } catch {
+          grid.innerHTML =
+            '<div class="state-empty"><i class="fas fa-exclamation-circle"></i>Failed to load trending movies.</div>';
+        }
+      }
+
+      async function loadRecommendations() {
+        const grid = document.getElementById("recommendGrid");
+        try {
+          const data = await fetchRecommendations();
+          grid.innerHTML = "";
+          if (!data.recommendations.length) {
+            grid.innerHTML =
+              '<div class="state-empty"><i class="fas fa-heart"></i>Like some movies to get personalized recommendations!</div>';
+            return;
+          }
+          data.recommendations.forEach((m) =>
+            grid.appendChild(createMovieCard(m, likedIds.has(m.tmdb_id))),
+          );
+        } catch {
+          grid.innerHTML =
+            '<div class="state-empty"><i class="fas fa-robot"></i>Could not load recommendations.</div>';
+        }
+      }
+
+      async function loadLiked() {
+        const grid = document.getElementById("likedGrid");
+        try {
+          const movies = await fetchLiked();
+          grid.innerHTML = "";
+          if (!movies.length) {
+            grid.innerHTML =
+              '<div class="state-empty"><i class="fas fa-heart-broken"></i>No liked movies yet.</div>';
+            return;
+          }
+          movies.forEach((m) =>
+            grid.appendChild(
+              createMovieCard(
+                {
+                  tmdb_id: m.tmdb_movie_id,
+                  title: m.title,
+                  poster_path: m.poster_path,
+                  vote_average: 0,
+                  genre_ids: [],
+                },
+                true,
+              ),
+            ),
+          );
+        } catch {
+          grid.innerHTML = '<div class="state-empty">Failed to load.</div>';
+        }
+      }
+
+      async function loadWatchlist() {
+        const grid = document.getElementById("watchlistGrid");
+        try {
+          const movies = await fetchWatchlist();
+          grid.innerHTML = "";
+          if (!movies.length) {
+            grid.innerHTML =
+              '<div class="state-empty"><i class="fas fa-bookmark"></i>Your watchlist is empty.</div>';
+            return;
+          }
+          movies.forEach((m) =>
+            grid.appendChild(
+              createMovieCard(
+                {
+                  tmdb_id: m.tmdb_movie_id,
+                  title: m.title,
+                  poster_path: m.poster_path,
+                  vote_average: 0,
+                  genre_ids: [],
+                },
+                likedIds.has(m.tmdb_movie_id),
+              ),
+            ),
+          );
+        } catch {
+          grid.innerHTML = '<div class="state-empty">Failed to load.</div>';
+        }
+      }
+
+      function showTab(tab, el) {
+        ["home", "search", "liked", "watchlist"].forEach((t) => {
+          document.getElementById(t + "Tab").style.display =
+            t === tab ? "block" : "none";
+        });
+        document
+          .querySelectorAll(".nav-tab")
+          .forEach((b) => b.classList.remove("active"));
+        if (el) el.classList.add("active");
+        if (tab === "liked") loadLiked();
+        if (tab === "watchlist") loadWatchlist();
+      }
+
+      // Search with debounce
+      let searchTimeout;
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        clearTimeout(searchTimeout);
+        const q = e.target.value.trim();
+        if (!q) {
+          showTab("home", null);
+          return;
+        }
+        searchTimeout = setTimeout(async () => {
+          showTab("search", null);
+          const grid = document.getElementById("searchGrid");
+          grid.innerHTML =
+            '<div class="state-loading"><div class="spinner"></div>Searching...</div>';
+          try {
+            const movies = await searchMovies(q);
+            grid.innerHTML = "";
+            if (!movies.length) {
+              grid.innerHTML =
+                '<div class="state-empty"><i class="fas fa-search"></i>No results found.</div>';
+              return;
+            }
+            movies.forEach((m) =>
+              grid.appendChild(createMovieCard(m, likedIds.has(m.tmdb_id))),
+            );
+          } catch {
+            grid.innerHTML = '<div class="state-empty">Search failed.</div>';
+          }
+        }, 500);
+      });
+
+      init();
+    </script>
+  </body>
+</html>

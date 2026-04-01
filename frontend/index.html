@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BingeBuddy | Welcome</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="welcome-screen">
+
+  <video autoplay muted loop id="bgVideo">
+    <source src="bg.mp4" type="video/mp4" />
+  </video>
+
+  <div class="video-overlay"></div>
+
+  <div class="welcome-content">
+    <button class="welcome-btn" onclick="window.location.href='login.html'">
+      Get Started
+    </button>
+  </div>
+  <script>
+    // Clear any existing session — user must log in every time
+    localStorage.removeItem('access_token');
+  </script>
+
+</body>
+</html>

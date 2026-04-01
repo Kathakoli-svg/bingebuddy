@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BingeBuddy — Movie</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="favicon.ico" />
+    <style>
+      /* ── Hero backdrop ───────────────────────────────────────────── */
+      .movie-hero {
+        position: relative;
+        width: 100%;
+        min-height: 520px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+      }
+      .movie-hero-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center top;
+        filter: brightness(0.35);
+        transition: opacity 0.5s;
+      }
+      .movie-hero-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, #0a0a0a 10%, transparent 70%);
+      }
+      .movie-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 36px;
+        padding: 40px 48px;
+        align-items: flex-end;
+        width: 100%;
+      }
+      .movie-detail-poster {
+        width: 200px;
+        min-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+      }
+      .movie-hero-info {
+        flex: 1;
+      }
+      .movie-hero-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 3rem;
+        color: #fff;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .movie-hero-tagline {
+        color: #e50914;
+        font-style: italic;
+        font-size: 1rem;
+        margin-bottom: 14px;
+        opacity: 0.9;
+      }
+      .movie-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .movie-meta-badge {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ccc;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
+      .movie-rating-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(229, 9, 20, 0.15);
+        border: 1px solid rgba(229, 9, 20, 0.4);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+      .movie-rating-badge i {
+        color: #f5c518;
+      }
+      .movie-genres {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+      .genre-tag {
+        background: rgba(229, 9, 20, 0.15);
+        border: 1px solid rgba(229, 9, 20, 0.3);
+        color: #e50914;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .movie-overview {
+        color: #bbb;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        max-width: 700px;
+        margin-bottom: 20px;
+      }
+      .movie-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+      .btn-action-primary {
+        background: #e50914;
+        color: #fff;
+      }
+      .btn-action-primary:hover {
+        background: #c40812;
+      }
+      .btn-action-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .btn-action-secondary:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .btn-action-secondary.active {
+        color: #e50914;
+        border-color: #e50914;
+      }
+
+      /* ── Page body ───────────────────────────────────────────────── */
+      .movie-page-body {
+        background: #0a0a0a;
+        min-height: 100vh;
+      }
+      .movie-sections {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 24px 80px;
+      }
+      .detail-section {
+        margin-bottom: 48px;
+      }
+      .detail-section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.6rem;
+        color: #fff;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .detail-section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.08);
+        margin-left: 12px;
+      }
+
+      /* ── Trailer ─────────────────────────────────────────────────── */
+      .trailer-wrap {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #111;
+      }
+      .trailer-wrap iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      .no-trailer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        background: #111;
+        border-radius: 12px;
+        color: #555;
+        font-size: 0.95rem;
+        gap: 10px;
+      }
+
+      /* ── Reviews ─────────────────────────────────────────────────── */
+      .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .review-card {
+        background: #141414;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 10px;
+        padding: 20px 24px;
+      }
+      .review-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .review-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e50914;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        font-size: 1rem;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+      .review-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .review-author {
+        font-weight: 500;
+        color: #fff;
+        font-size: 0.95rem;
+      }
+      .review-date {
+        font-size: 0.78rem;
+        color: #666;
+      }
+      .review-stars {
+        margin-left: auto;
+        color: #f5c518;
+        font-size: 0.85rem;
+      }
+      .review-content {
+        color: #aaa;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+        transition: max-height 0.3s ease;
+      }
+      .review-content.expanded {
+        max-height: 2000px;
+      }
+      .review-content:not(.expanded)::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(transparent, #141414);
+      }
+      .btn-read-more {
+        background: none;
+        border: none;
+        color: #e50914;
+        font-size: 0.8rem;
+        cursor: pointer;
+        padding: 6px 0 0;
+        font-family: inherit;
+      }
+      .no-reviews {
+        color: #555;
+        font-size: 0.95rem;
+        padding: 20px 0;
+      }
+
+      /* ── Navbar back btn ─────────────────────────────────────────── */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .btn-back {
+        background: none;
+        border: none;
+        color: #aaa;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0;
+        font-family: inherit;
+        transition: color 0.2s;
+      }
+      .btn-back:hover {
+        color: #fff;
+      }
+
+      /* ── Loading skeleton ────────────────────────────────────────── */
+      .skeleton {
+        background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 6px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .movie-hero-content {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 24px 20px;
+        }
+        .movie-detail-poster {
+          width: 140px;
+          min-width: 140px;
+        }
+        .movie-hero-title {
+          font-size: 2rem;
+        }
+        .movie-sections {
+          padding: 24px 16px 60px;
+        }
+      }
+    </style>
+  </head>
+  <body class="movie-page-body">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">
+        <div class="navbar-brand-icon">
+          <img src="favicon.ico" alt="BingeBuddy icon" />
+        </div>
+        <span class="navbar-brand-name">BingeBuddy</span>
+      </a>
+      <div class="navbar-nav">
+        <button class="btn-back" onclick="history.back()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="movie-hero" id="hero">
+      <div class="movie-hero-bg" id="heroBg"></div>
+      <div class="movie-hero-gradient"></div>
+      <div class="movie-hero-content">
+        <img
+          id="heroPoster"
+          class="movie-detail-poster"
+          src=""
+          alt=""
+          style="display: none"
+        />
+        <div class="movie-hero-info">
+          <div id="heroSkeleton">
+            <div
+              class="skeleton"
+              style="height: 48px; width: 60%; margin-bottom: 12px"
+            ></div>
+            <div
+              class="skeleton"
+              style="height: 20px; width: 40%; margin-bottom: 16px"
+            ></div>
+            <div
+              class="skeleton"
+              style="height: 14px; width: 80%; margin-bottom: 8px"
+            ></div>
+            <div class="skeleton" style="height: 14px; width: 70%"></div>
+          </div>
+          <div id="heroInfo" style="display: none">
+            <h1 class="movie-hero-title" id="movieTitle"></h1>
+            <p class="movie-hero-tagline" id="movieTagline"></p>
+            <div class="movie-meta">
+              <span class="movie-rating-badge"
+                ><i class="fas fa-star"></i><span id="movieRating"></span> /
+                10</span
+              >
+              <span class="movie-meta-badge" id="movieYear"></span>
+              <span class="movie-meta-badge" id="movieRuntime"></span>
+              <span class="movie-meta-badge" id="movieStatus"></span>
+            </div>
+            <div class="movie-genres" id="movieGenres"></div>
+            <p class="movie-overview" id="movieOverview"></p>
+            <div class="movie-actions">
+              <button
+                class="btn-action btn-action-primary"
+                id="btnTrailer"
+                onclick="scrollToTrailer()"
+              >
+                <i class="fas fa-play"></i> Watch Trailer
+              </button>
+              <button
+                class="btn-action btn-action-secondary"
+                id="btnLike"
+                onclick="toggleLike()"
+              >
+                <i class="far fa-heart"></i> Like
+              </button>
+              <button
+                class="btn-action btn-action-secondary"
+                id="btnWatchlist"
+                onclick="toggleWatchlist()"
+              >
+                <i class="fas fa-bookmark"></i> Watchlist
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sections -->
+    <div class="movie-sections">
+      <!-- Trailer -->
+      <div class="detail-section" id="trailerSection">
+        <h2 class="detail-section-title">
+          <i class="fas fa-film"></i> Trailer
+        </h2>
+        <div id="trailerContainer">
+          <div
+            class="skeleton"
+            style="padding-bottom: 56.25%; border-radius: 12px"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="detail-section">
+        <h2 class="detail-section-title">
+          <i class="fas fa-comments"></i> Reviews
+        </h2>
+        <div id="reviewsContainer">
+          <div
+            class="skeleton"
+            style="height: 120px; margin-bottom: 12px; border-radius: 10px"
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 120px; border-radius: 10px"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/movies.js"></script>
+    <script>
+      requireAuth();
+
+      const params = new URLSearchParams(window.location.search);
+      const movieId = params.get("id");
+      if (!movieId) window.location.href = "home.html";
+
+      let movieData = null;
+      let isLiked = false;
+
+      async function init() {
+        try {
+          const [detail, videos, reviews, liked] = await Promise.allSettled([
+            fetch(`${API_BASE_URL}/movies/${movieId}`, {
+              headers: authHeaders(),
+            }).then((r) => r.json()),
+            fetch(`${API_BASE_URL}/movies/${movieId}/videos`, {
+              headers: authHeaders(),
+            }).then((r) => r.json()),
+            fetch(`${API_BASE_URL}/movies/${movieId}/reviews`, {
+              headers: authHeaders(),
+            }).then((r) => r.json()),
+            fetch(`${API_BASE_URL}/user/liked`, {
+              headers: authHeaders(),
+            }).then((r) => r.json()),
+          ]);
+
+          if (detail.status === "fulfilled") renderDetail(detail.value);
+          if (videos.status === "fulfilled") renderTrailer(videos.value);
+          else renderNoTrailer();
+          if (reviews.status === "fulfilled") renderReviews(reviews.value);
+          else renderNoReviews();
+
+          if (liked.status === "fulfilled") {
+            isLiked = liked.value.some(
+              (m) => String(m.tmdb_movie_id) === String(movieId),
+            );
+            updateLikeBtn();
+          }
+        } catch (e) {
+          console.error("Failed to load movie:", e);
+        }
+      }
+
+      function renderDetail(movie) {
+        movieData = movie;
+        document.title = `BingeBuddy — ${movie.title}`;
+
+        // Backdrop
+        if (movie.backdrop_path) {
+          document.getElementById("heroBg").style.backgroundImage =
+            `url(https://image.tmdb.org/t/p/w1280${movie.backdrop_path})`;
+        }
+
+        // Poster
+        const poster = document.getElementById("heroPoster");
+        if (movie.poster_path) {
+          poster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+          poster.alt = movie.title;
+          poster.style.display = "block";
+        }
+
+        document.getElementById("movieTitle").textContent = movie.title;
+        document.getElementById("movieTagline").textContent =
+          movie.tagline || "";
+        document.getElementById("movieTagline").style.display = movie.tagline
+          ? "block"
+          : "none";
+        document.getElementById("movieRating").textContent = movie.vote_average;
+        document.getElementById("movieYear").textContent =
+          movie.release_date?.slice(0, 4) || "—";
+        document.getElementById("movieRuntime").textContent = movie.runtime
+          ? `${movie.runtime} min`
+          : "";
+        document.getElementById("movieStatus").textContent = movie.status || "";
+        document.getElementById("movieOverview").textContent = movie.overview;
+
+        // Genres
+        const genresEl = document.getElementById("movieGenres");
+        (movie.genres || []).forEach((g) => {
+          const span = document.createElement("span");
+          span.className = "genre-tag";
+          span.textContent = g.name;
+          genresEl.appendChild(span);
+        });
+
+        document.getElementById("heroSkeleton").style.display = "none";
+        document.getElementById("heroInfo").style.display = "block";
+      }
+
+      function renderTrailer(videos) {
+        const container = document.getElementById("trailerContainer");
+        if (!videos || videos.length === 0) {
+          renderNoTrailer();
+          return;
+        }
+        const trailer = videos[0];
+        container.innerHTML = `
+        <div class="trailer-wrap">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/${trailer.key}?rel=0&modestbranding=1"
+            title="${trailer.name}"
+            allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+          </iframe>
+        </div>`;
+      }
+
+      function renderNoTrailer() {
+        document.getElementById("trailerContainer").innerHTML =
+          `<div class="no-trailer"><i class="fas fa-video-slash"></i> No trailer available</div>`;
+      }
+
+      function renderReviews(reviews) {
+        const container = document.getElementById("reviewsContainer");
+        if (!reviews || reviews.length === 0) {
+          renderNoReviews();
+          return;
+        }
+        container.innerHTML = "";
+        const list = document.createElement("div");
+        list.className = "reviews-list";
+
+        reviews.slice(0, 6).forEach((r) => {
+          const card = document.createElement("div");
+          card.className = "review-card";
+
+          const stars = r.rating
+            ? `<span class="review-stars">${"★".repeat(Math.round(r.rating / 2))}${"☆".repeat(5 - Math.round(r.rating / 2))} ${r.rating}/10</span>`
+            : "";
+
+          const initials = (r.author || "?").charAt(0).toUpperCase();
+
+          card.innerHTML = `
+          <div class="review-header">
+            <div class="review-avatar">${initials}</div>
+            <div>
+              <div class="review-author">${escHtml(r.author)}</div>
+              <div class="review-date">${r.created_at || ""}</div>
+            </div>
+            ${stars}
+          </div>
+          <div class="review-content" id="rc-${Math.random().toString(36).slice(2)}">
+            ${escHtml(r.content)}
+          </div>
+          <button class="btn-read-more" onclick="toggleReview(this)">Read more</button>
+        `;
+
+          list.appendChild(card);
+        });
+
+        container.appendChild(list);
+      }
+
+      function renderNoReviews() {
+        document.getElementById("reviewsContainer").innerHTML =
+          `<p class="no-reviews"><i class="fas fa-comment-slash"></i> No reviews yet.</p>`;
+      }
+
+      function toggleReview(btn) {
+        const content = btn.previousElementSibling;
+        content.classList.toggle("expanded");
+        btn.textContent = content.classList.contains("expanded")
+          ? "Show less"
+          : "Read more";
+      }
+
+      function scrollToTrailer() {
+        document
+          .getElementById("trailerSection")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      function updateLikeBtn() {
+        const btn = document.getElementById("btnLike");
+        if (isLiked) {
+          btn.classList.add("active");
+          btn.innerHTML = `<i class="fas fa-heart"></i> Liked`;
+        } else {
+          btn.classList.remove("active");
+          btn.innerHTML = `<i class="far fa-heart"></i> Like`;
+        }
+      }
+
+      async function toggleLike() {
+        if (!movieData) return;
+        const method = isLiked ? "DELETE" : "POST";
+        const url = `${API_BASE_URL}/user/liked${isLiked ? `/${movieId}` : ""}`;
+        const poster = movieData.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}`
+          : "";
+        const body = isLiked
+          ? null
+          : JSON.stringify({
+              tmdb_movie_id: Number(movieId),
+              title: movieData.title,
+              poster_path: poster,
+              genre_ids:
+                (movieData.genres || []).map((g) => g.id).join(",") || null,
+            });
+
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: authHeaders(),
+            body,
+          });
+          if (res.ok) {
+            isLiked = !isLiked;
+            updateLikeBtn();
+          }
+        } catch (e) {
+          console.error("Like failed:", e);
+        }
+      }
+
+      async function toggleWatchlist() {
+        if (!movieData) return;
+        const btn = document.getElementById("btnWatchlist");
+        const poster = movieData.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movieData.poster_path}`
+          : "";
+        try {
+          const res = await fetch(`${API_BASE_URL}/user/watchlist`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+              tmdb_movie_id: Number(movieId),
+              title: movieData.title,
+              poster_path: poster,
+            }),
+          });
+          if (res.ok) {
+            btn.innerHTML = `<i class="fas fa-check"></i> Added!`;
+            setTimeout(() => {
+              btn.innerHTML = `<i class="fas fa-bookmark"></i> Watchlist`;
+            }, 2000);
+          }
+        } catch (e) {
+          console.error("Watchlist failed:", e);
+        }
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      init();
+    </script>
+  </body>
+</html>

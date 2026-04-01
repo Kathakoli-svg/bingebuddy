@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BingeBuddy — Register</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="favicon.ico" />
+  </head>
+
+  <body class="auth-screen">
+    <div class="auth-card">
+      <a href="index.html" class="auth-brand">
+        <div class="auth-brand-icon">
+          <img src="favicon.ico" alt="BingeBuddy icon" />
+        </div>
+        <span class="auth-brand-name">BingeBuddy</span>
+      </a>
+
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-subtitle">Join and discover your next watch</p>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="cooluser123" />
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="you@example.com" />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Min 6 characters" />
+      </div>
+
+      <button class="btn-primary" id="registerBtn" onclick="handleRegister()">
+        Create Account
+      </button>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+
+    <div class="filmstrip"></div>
+
+    <script src="js/auth.js"></script>
+    <script>
+      if (localStorage.getItem("access_token"))
+        window.location.href = "home.html";
+
+      async function handleRegister() {
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const btn = document.getElementById("registerBtn");
+        const errorMsg = document.getElementById("errorMsg");
+
+        errorMsg.style.display = "none";
+
+        if (!username || !email || !password) {
+          errorMsg.textContent = "Please fill in all fields";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Creating account...";
+
+        // Step 1 — Register
+        const registerResult = await registerUser(username, email, password);
+
+        if (!registerResult.success) {
+          errorMsg.textContent = registerResult.error || "Registration failed";
+          errorMsg.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Create Account";
+          return;
+        }
+
+        // Step 2 — Auto login with same credentials
+        btn.textContent = "Signing in...";
+        const loginResult = await loginUser(email, password);
+
+        if (loginResult.success) {
+          window.location.href = "genres.html";
+        } else {
+          // Registration succeeded but auto-login failed
+          // Show message and redirect to login
+          errorMsg.textContent = "Account created! Please log in.";
+          errorMsg.style.color = "#4ade80";
+          errorMsg.style.display = "block";
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1500);
+        }
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") handleRegister();
+      });
+    </script>
+  </body>
+</html>
