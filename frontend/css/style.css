@@ -719,27 +719,63 @@ body {
 }
 
 /* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .app-main {
+    padding: 1.5rem;
+  }
+  .section {
+    margin-bottom: 2.5rem;
+  }
+  .section-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .section-title {
+    font-size: 1.55rem;
+  }
+  .navbar-search {
+    max-width: none;
+  }
+  .movie-meta {
+    gap: 10px;
+  }
+}
+
 @media (max-width: 768px) {
   /* Navbar */
   .navbar {
-    padding: 0 1rem;
+    padding: 0.75rem 1rem;
     gap: 0.75rem;
-    height: 56px;
+    height: auto;
+    flex-wrap: wrap;
+    align-items: center;
   }
   .navbar-brand-name {
     display: none;
   }
   .navbar-search {
+    flex: 1 1 100%;
     max-width: none;
+    padding: 0.4rem 0.9rem;
+  }
+  .navbar-nav {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .nav-tab,
+  .nav-logout {
+    flex: 1 1 auto;
   }
   .nav-tab {
-    padding: 0.35rem 0.6rem;
+    padding: 0.35rem 0.65rem;
     font-size: 0.78rem;
   }
   .nav-logout {
-    padding: 0.3rem 0.6rem;
+    padding: 0.35rem 0.65rem;
     font-size: 0.75rem;
-    margin-left: 0.2rem;
+    margin-left: 0;
   }
 
   /* Main */
@@ -752,14 +788,20 @@ body {
   .section-title {
     font-size: 1.4rem;
   }
+  .section-header {
+    justify-content: space-between;
+  }
+  .section-badge {
+    margin-top: 0.25rem;
+  }
 
-  /* Movies grid — 2 columns on mobile */
+  /* Movies grid — 2 columns on tablet */
   .movies-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
-  /* Genres — 2 columns on mobile */
+  /* Genres — 2 columns on tablet */
   .genres-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -767,7 +809,7 @@ body {
     font-size: 2rem;
   }
 
-  /* Auth card */
+  /* Auth */
   .auth-card {
     padding: 1.75rem;
   }
@@ -778,43 +820,122 @@ body {
     left: 1rem;
     padding: 1rem;
     gap: 1rem;
-  }
-  .welcome-icon {
-    width: 70px;
-    height: 70px;
-    font-size: 1.8rem;
+    max-width: calc(100vw - 2rem);
   }
   .welcome-btn {
-    padding: 0.75rem 2rem;
+    width: auto;
+    padding: 0.8rem 2rem;
   }
 }
 
-@media (max-width: 480px) {
-  /* Navbar — hide nav tabs text, show icons only via emoji */
+@media (max-width: 576px) {
   .navbar {
     gap: 0.5rem;
   }
-  .nav-tab {
-    padding: 0.3rem 0.5rem;
+  .navbar-search {
+    padding: 0.35rem 0.8rem;
+  }
+  .nav-tab,
+  .nav-logout {
+    padding: 0.3rem 0.55rem;
     font-size: 0.72rem;
   }
-
-  /* Movies — still 2 columns but tighter */
   .movies-grid {
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
   }
   .movie-title,
   .card-title {
     font-size: 0.78rem;
   }
-
-  /* Auth */
   .auth-card {
     padding: 1.25rem;
     border-radius: 16px;
   }
   .auth-title {
     font-size: 1.2rem;
+  }
+  .genres-grid {
+    grid-template-columns: 1fr;
+  }
+  .genres-wrap {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.5rem 0.75rem;
+  }
+  .navbar-search {
+    width: 100%;
+  }
+  .navbar-nav {
+    gap: 0.4rem;
+  }
+  .nav-tab,
+  .nav-logout {
+    width: 100%;
+    text-align: center;
+    padding: 0.35rem 0.5rem;
+  }
+  .movies-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  .movie-title,
+  .card-title {
+    font-size: 0.76rem;
+  }
+  .auth-card {
+    padding: 1rem;
+  }
+  .auth-footer {
+    font-size: 0.8rem;
+  }
+  .welcome-content {
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+  .movie-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 16px;
+  }
+  .movie-detail-poster {
+    width: 140px;
+    min-width: 140px;
+  }
+  .movie-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+  .movie-meta {
+    gap: 8px;
+  }
+  .movie-genres {
+    justify-content: flex-start;
+  }
+  .movie-sections {
+    padding: 20px 16px 60px;
+  }
+}
+
+@media (max-width: 360px) {
+  .welcome-btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+  }
+  .navbar-brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .navbar-search input {
+    font-size: 0.82rem;
   }
 }
 
