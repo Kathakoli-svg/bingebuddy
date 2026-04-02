@@ -1,7 +1,7 @@
 // Same origin when UI is served by FastAPI (`python run_server.py`). file:// falls back to local API.
 const API_BASE_URL =
   window.location.protocol === "file:" || window.location.origin === "null"
-    ? "http://127.0.0.1:8000"
+    ? "https://bingebuddy-5.onrender.com"
     : window.location.origin;
 
 /**
@@ -46,7 +46,8 @@ async function loginUser(email, password) {
     console.error("Login error:", error);
     return {
       success: false,
-      error: "Could not connect to the server. Is your FastAPI backend running?",
+      error:
+        "Could not connect to the server. Is your FastAPI backend running?",
     };
   }
 }
@@ -70,7 +71,8 @@ async function registerUser(username, email, password) {
     console.error("Register error:", error);
     return {
       success: false,
-      error: "Could not connect to the server. Is your FastAPI backend running?",
+      error:
+        "Could not connect to the server. Is your FastAPI backend running?",
     };
   }
 }
