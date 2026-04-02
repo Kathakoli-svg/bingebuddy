@@ -13,7 +13,7 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 app = FastAPI(title="AI Movie Recommender", version="1.0.0")
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["https://bingebuddytv.netlify.app"], allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(auth.router,      prefix="/auth",      tags=["Auth"])
 app.include_router(movies.router,    prefix="/movies",    tags=["Movies"])
