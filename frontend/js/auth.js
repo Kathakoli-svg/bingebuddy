@@ -16,11 +16,9 @@ function redirectIfLoggedIn(destination = "home.html") {
     window.location.href = destination;
   }
 }
-
 function requireAuth() {
   const token = localStorage.getItem("access_token");
-  if (!token || isTokenExpired(token)) {
-    localStorage.removeItem("access_token");
+  if (!token) {
     window.location.href = "login.html";
   }
 }
