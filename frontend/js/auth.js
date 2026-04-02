@@ -1,13 +1,26 @@
 // Same origin when UI is served by FastAPI (`python run_server.py`). file:// falls back to local API.
 const API_BASE_URL = "https://bingebuddy-5.onrender.com";
 
-/**
- * Checks if the user is logged in.
- * If not, redirects them to the login page.
- */
+function isTokenExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
+function redirectIfLoggedIn(destination = "home.html") {
+  const token = localStorage.getItem("access_token");
+  if (token && !isTokenExpired(token)) {
+    window.location.href = destination;
+  }
+}
+
 function requireAuth() {
   const token = localStorage.getItem("access_token");
-  if (!token) {
+  if (!token || isTokenExpired(token)) {
+    localStorage.removeItem("access_token");
     window.location.href = "login.html";
   }
 }
