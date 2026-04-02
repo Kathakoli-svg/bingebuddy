@@ -20,15 +20,13 @@
       </button>
     </div>
     <script>
-      const token = localStorage.getItem("access_token");
-      const expiry = localStorage.getItem("access_token_expires_at");
-      const expired = expiry ? Date.now() > Number(expiry) : false;
-
-      if (token && !expired) {
-        window.location.href = "home.html";
-      } else if (expired) {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("access_token_expires_at");
+      function handleGetStarted() {
+        const token = localStorage.getItem("access_token");
+        if (token && !isTokenExpired()) {
+          window.location.href = "app.html"; // your main app page
+        } else {
+          window.location.href = "login.html";
+        }
       }
     </script>
   </body>

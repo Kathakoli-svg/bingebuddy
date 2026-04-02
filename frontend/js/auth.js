@@ -1,30 +1,21 @@
 // Same origin when UI is served by FastAPI (`python run_server.py`). file:// falls back to local API.
 const API_BASE_URL = "https://bingebuddy-5.onrender.com";
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-function getSessionExpiry() {
-  const expiry = localStorage.getItem("access_token_expires_at");
-  return expiry ? Number(expiry) : null;
-}
-
-function isSessionExpired() {
-  const expiresAt = getSessionExpiry();
-  return expiresAt !== null && Date.now() > expiresAt;
-}
-
-function clearSession() {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("access_token_expires_at");
-}
-
 /**
  * Checks if the user is logged in.
  * If not, redirects them to the login page.
  */
+function isTokenExpired() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return true;
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  return payload.exp * 1000 < Date.now();
+}
+
 function requireAuth() {
   const token = localStorage.getItem("access_token");
-  if (!token || isSessionExpired()) {
-    clearSession();
+  if (!token || isTokenExpired()) {
+    localStorage.removeItem("access_token");
     window.location.href = "login.html";
   }
 }
@@ -53,10 +44,6 @@ async function loginUser(email, password) {
     const data = await response.json();
     if (response.ok) {
       localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem(
-        "access_token_expires_at",
-        String(Date.now() + SESSION_TTL_MS),
-      );
       return { success: true };
     }
     return { success: false, error: parseErrorDetail(data) };
@@ -110,6 +97,6 @@ function authHeaders() {
  * Clears the session and redirects to login.
  */
 function logout() {
-  clearSession();
+  localStorage.removeItem("access_token");
   window.location.href = "login.html";
 }
