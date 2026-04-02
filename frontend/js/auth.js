@@ -8,8 +8,15 @@ function isTokenExpired() {
   const token = localStorage.getItem("access_token");
   if (!token) return true;
 
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  return payload.exp * 1000 < Date.now();
+  try {
+    // Convert base64url to base64 (- to +, _ to /)
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+    return payload.exp * 1000 < Date.now();
+  } catch (error) {
+    console.error("Token decode error:", error);
+    return true; // Treat as expired if decode fails
+  }
 }
 
 function requireAuth() {

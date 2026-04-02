@@ -1,4 +1,4 @@
-<!doctype html>
+<<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,15 +15,16 @@
     <div class="video-overlay"></div>
 
     <div class="welcome-content">
-      <button class="welcome-btn" onclick="window.location.href = 'login.html'">
+      <button class="welcome-btn" onclick="handleGetStarted()">
         Get Started
       </button>
     </div>
+    <script src="js/auth.js"></script>
     <script>
       function handleGetStarted() {
         const token = localStorage.getItem("access_token");
         if (token && !isTokenExpired()) {
-          window.location.href = "home.html"; //main app page
+          window.location.href = "home.html";
         } else {
           window.location.href = "login.html";
         }
