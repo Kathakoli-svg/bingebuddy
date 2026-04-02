@@ -1,9 +1,5 @@
 // Same origin when UI is served by FastAPI (`python run_server.py`). file:// falls back to local API.
-const API_BASE_URL =
-  window.location.protocol === "file:" || window.location.origin === "null"
-    ? "https://bingebuddy-5.onrender.com"
-    : window.location.origin;
-
+const API_BASE_URL = "https://bingebuddy-5.onrender.com";
 /**
  * Checks if the user is logged in.
  * If not, redirects them to the login page.
