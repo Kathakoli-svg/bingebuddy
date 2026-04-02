@@ -1,21 +1,16 @@
 // Same origin when UI is served by FastAPI (`python run_server.py`). file:// falls back to local API.
-const API_BASE_URL = "https://bingebuddy-5.onrender.com";
+const API_BASE_URL =
+  window.location.protocol === "file:" || window.location.origin === "null"
+    ? "http://127.0.0.1:8000"
+    : window.location.origin;
+
 /**
  * Checks if the user is logged in.
  * If not, redirects them to the login page.
  */
-function isTokenExpired() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return true;
-
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  return payload.exp * 1000 < Date.now();
-}
-
 function requireAuth() {
   const token = localStorage.getItem("access_token");
-  if (!token || isTokenExpired()) {
-    localStorage.removeItem("access_token");
+  if (!token) {
     window.location.href = "login.html";
   }
 }
@@ -51,8 +46,7 @@ async function loginUser(email, password) {
     console.error("Login error:", error);
     return {
       success: false,
-      error:
-        "Could not connect to the server. Is your FastAPI backend running?",
+      error: "Could not connect to the server. Is your FastAPI backend running?",
     };
   }
 }
@@ -76,8 +70,7 @@ async function registerUser(username, email, password) {
     console.error("Register error:", error);
     return {
       success: false,
-      error:
-        "Could not connect to the server. Is your FastAPI backend running?",
+      error: "Could not connect to the server. Is your FastAPI backend running?",
     };
   }
 }
