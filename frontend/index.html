@@ -23,7 +23,7 @@
       function handleGetStarted() {
         const token = localStorage.getItem("access_token");
         if (token && !isTokenExpired()) {
-          window.location.href = "app.html"; // your main app page
+          window.location.href = "home.html"; //main app page
         } else {
           window.location.href = "login.html";
         }
