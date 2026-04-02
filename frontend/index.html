@@ -20,15 +20,5 @@
       </button>
     </div>
     <script src="js/auth.js"></script>
-    <script>
-      function handleGetStarted() {
-        const token = localStorage.getItem("access_token");
-        if (token && !isTokenExpired()) {
-          window.location.href = "home.html";
-        } else {
-          window.location.href = "login.html";
-        }
-      }
-    </script>
   </body>
 </html>
