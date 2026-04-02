@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,7 +15,13 @@
     <div class="video-overlay"></div>
 
     <div class="welcome-content">
-      <button class="welcome-btn" onclick="window.location.href = 'login.html'">
+      <button
+        class="welcome-btn"
+        onclick="
+          var token = localStorage.getItem('access_token');
+          window.location.href = token ? 'home.html' : 'login.html';
+        "
+      >
         Get Started
       </button>
     </div>
