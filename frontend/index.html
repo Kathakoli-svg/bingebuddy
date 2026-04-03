@@ -19,11 +19,12 @@
         class="welcome-btn"
         onclick="
           var token = localStorage.getItem('access_token');
-          window.location.href = token ? 'home.html' : 'login.html';
+          window.location.href = (token && !isTokenExpired(token)) ? 'home.html' : 'login.html';
         "
       >
         Get Started
       </button>
     </div>
+    <script src="js/auth.js"></script>
   </body>
 </html>
