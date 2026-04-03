@@ -792,6 +792,11 @@ body {
 }
 
 @media (max-width: 480px) {
+  #bgVideo {
+    width: auto;
+    height: 100%;
+  }
+
   .navbar {
     gap: 0.4rem;
     padding: 0 0.75rem;
