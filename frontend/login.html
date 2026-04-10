@@ -14,38 +14,150 @@
       rel="stylesheet"
     />
     <link rel="icon" href="favicon.ico" />
+    <style>
+      .otp-input {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 1.4rem;
+        letter-spacing: 8px;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .otp-input:focus {
+        border-color: var(--accent);
+      }
+      .success-msg {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+        color: #4ade80;
+        padding: 0.65rem 1rem;
+        border-radius: 10px;
+        font-size: 0.83rem;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--accent2);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 0;
+        text-decoration: underline;
+      }
+      .link-btn:hover {
+        color: var(--accent);
+      }
+    </style>
   </head>
-
   <body class="auth-screen">
-    <div class="auth-card">
+    <!-- ── Login Panel ── -->
+    <div class="auth-card" id="loginPanel">
       <a href="index.html" class="auth-brand">
         <div class="auth-brand-icon">
           <img src="favicon.ico" alt="BingeBuddy icon" />
         </div>
         <span class="auth-brand-name">BingeBuddy</span>
       </a>
-
       <h2 class="auth-title">Welcome back</h2>
       <p class="auth-subtitle">Sign in to continue</p>
-
-      <div class="error-msg" id="errorMsg"></div>
-
+      <div class="error-msg" id="loginError"></div>
       <div class="field">
         <label>Email</label>
         <input type="email" id="email" placeholder="you@example.com" />
       </div>
-
       <div class="field">
         <label>Password</label>
         <input type="password" id="password" placeholder="••••••••" />
       </div>
-
+      <div style="text-align: right; margin-bottom: 0.5rem">
+        <button class="link-btn" onclick="showPanel('forgotPanel')">
+          Forgot password?
+        </button>
+      </div>
       <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
         Sign In
       </button>
-
       <div class="auth-footer">
         Don't have an account? <a href="register.html">Sign up</a>
+      </div>
+    </div>
+
+    <!-- ── Forgot Password Panel ── -->
+    <div class="auth-card" id="forgotPanel" style="display: none">
+      <a href="index.html" class="auth-brand">
+        <div class="auth-brand-icon">
+          <img src="favicon.ico" alt="BingeBuddy icon" />
+        </div>
+        <span class="auth-brand-name">BingeBuddy</span>
+      </a>
+      <h2 class="auth-title">Reset Password</h2>
+      <p class="auth-subtitle">Enter your email to receive an OTP</p>
+      <div class="error-msg" id="forgotError"></div>
+      <div class="success-msg" id="forgotSuccess"></div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="forgotEmail" placeholder="you@example.com" />
+      </div>
+      <button class="btn-primary" id="sendOtpBtn" onclick="handleForgot()">
+        Send OTP
+      </button>
+      <div class="auth-footer">
+        <button class="link-btn" onclick="showPanel('loginPanel')">
+          ← Back to login
+        </button>
+      </div>
+    </div>
+
+    <!-- ── OTP Verification Panel ── -->
+    <div class="auth-card" id="otpPanel" style="display: none">
+      <a href="index.html" class="auth-brand">
+        <div class="auth-brand-icon">
+          <img src="favicon.ico" alt="BingeBuddy icon" />
+        </div>
+        <span class="auth-brand-name">BingeBuddy</span>
+      </a>
+      <h2 class="auth-title">Enter OTP</h2>
+      <p class="auth-subtitle" id="otpSubtitle">
+        We sent a 6-digit code to your email
+      </p>
+      <div class="error-msg" id="otpError"></div>
+      <div class="success-msg" id="otpSuccess"></div>
+      <div class="field">
+        <label>OTP Code</label>
+        <input
+          type="text"
+          class="otp-input"
+          id="otpCode"
+          maxlength="6"
+          placeholder="------"
+        />
+      </div>
+      <div class="field">
+        <label>New Password</label>
+        <input type="password" id="newPassword" placeholder="••••••••" />
+      </div>
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary" id="resetBtn" onclick="handleReset()">
+        Reset Password
+      </button>
+      <div class="auth-footer">
+        Didn't get the code?
+        <button class="link-btn" onclick="handleForgot(true)">Resend</button>
+        &nbsp;·&nbsp;
+        <button class="link-btn" onclick="showPanel('loginPanel')">
+          ← Back
+        </button>
       </div>
     </div>
 
@@ -53,37 +165,156 @@
 
     <script src="js/auth.js"></script>
     <script>
+      let resetEmail = "";
+
+      function showPanel(id) {
+        ["loginPanel", "forgotPanel", "otpPanel"].forEach(
+          (p) =>
+            (document.getElementById(p).style.display =
+              p === id ? "block" : "none"),
+        );
+      }
+
+      function showError(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+
+      function showSuccess(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+
+      function hideMessages(...ids) {
+        ids.forEach((id) => {
+          document.getElementById(id).style.display = "none";
+        });
+      }
+
       async function handleLogin() {
         const email = document.getElementById("email").value.trim();
         const password = document.getElementById("password").value;
         const btn = document.getElementById("loginBtn");
-        const errorMsg = document.getElementById("errorMsg");
+        hideMessages("loginError");
 
-        errorMsg.style.display = "none";
-
-        if (!email || !password) {
-          errorMsg.textContent = "Please fill in all fields";
-          errorMsg.style.display = "block";
-          return;
-        }
+        if (!email || !password)
+          return showError("loginError", "Please fill in all fields");
 
         btn.disabled = true;
         btn.textContent = "Signing in...";
-
         const result = await loginUser(email, password);
 
         if (result.success) {
           window.location.href = "home.html";
         } else {
-          errorMsg.textContent = result.error || "Login failed";
-          errorMsg.style.display = "block";
+          showError("loginError", result.error || "Login failed");
           btn.disabled = false;
           btn.textContent = "Sign In";
         }
       }
 
+      async function handleForgot(resend = false) {
+        const email = resend
+          ? resetEmail
+          : document.getElementById("forgotEmail").value.trim();
+        hideMessages("forgotError", "forgotSuccess");
+
+        if (!email) return showError("forgotError", "Please enter your email");
+
+        const btn = document.getElementById("sendOtpBtn");
+        btn.disabled = true;
+        btn.textContent = "Sending...";
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            resetEmail = email;
+            if (resend) {
+              showSuccess("otpSuccess", "New OTP sent!");
+            } else {
+              document.getElementById("otpSubtitle").textContent =
+                `We sent a code to ${email}`;
+              showPanel("otpPanel");
+            }
+          } else {
+            showError("forgotError", data.detail || "Something went wrong");
+          }
+        } catch {
+          showError("forgotError", "Could not connect to server");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send OTP";
+        }
+      }
+
+      async function handleReset() {
+        const otp = document.getElementById("otpCode").value.trim();
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+        hideMessages("otpError", "otpSuccess");
+
+        if (!otp || otp.length !== 6)
+          return showError("otpError", "Enter the 6-digit OTP");
+        if (!newPassword) return showError("otpError", "Enter a new password");
+        if (newPassword !== confirmPassword)
+          return showError("otpError", "Passwords do not match");
+        if (newPassword.length < 6)
+          return showError(
+            "otpError",
+            "Password must be at least 6 characters",
+          );
+
+        const btn = document.getElementById("resetBtn");
+        btn.disabled = true;
+        btn.textContent = "Resetting...";
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: resetEmail,
+              otp,
+              new_password: newPassword,
+            }),
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            showSuccess(
+              "otpSuccess",
+              "Password reset! Redirecting to login...",
+            );
+            setTimeout(() => showPanel("loginPanel"), 2000);
+          } else {
+            showError("otpError", data.detail || "Reset failed");
+          }
+        } catch {
+          showError("otpError", "Could not connect to server");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Reset Password";
+        }
+      }
+
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") handleLogin();
+        if (e.key === "Enter") {
+          if (document.getElementById("loginPanel").style.display !== "none")
+            handleLogin();
+          if (document.getElementById("forgotPanel").style.display !== "none")
+            handleForgot();
+          if (document.getElementById("otpPanel").style.display !== "none")
+            handleReset();
+        }
       });
     </script>
   </body>
