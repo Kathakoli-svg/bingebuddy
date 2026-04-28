@@ -168,6 +168,14 @@ body {
     font-size: 0.85rem;
     text-align: left;
   }
+  .welcome-btn {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.8rem 2rem;
+    font-size: 0.9rem;
+  }
 }
 
 /* ── Auth ────────────────────────────────────────────────── */
