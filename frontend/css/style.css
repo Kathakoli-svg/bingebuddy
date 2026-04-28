@@ -158,6 +158,18 @@ body {
   animation: fadeUp 0.8s ease-out 0.2s both;
 }
 
+@media (max-width: 600px) {
+  .tagline {
+    position: absolute;
+    top: 2rem;
+    left: 1rem;
+    right: 1rem;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+    text-align: left;
+  }
+}
+
 /* ── Auth ────────────────────────────────────────────────── */
 .auth-screen {
   min-height: 100vh;
