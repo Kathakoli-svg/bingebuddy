@@ -170,19 +170,11 @@ body {
     gap: 0.5rem;
   }
   .tagline {
-    position: static;
-    margin-bottom: 0.5rem;
-    margin-left: 0;
-    margin-right: 0;
-    font-size: 0.95rem;
-    text-align: left;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    visibility: hidden;
   }
   .welcome-btn {
     position: static;
+    margin: 0;
     margin: 0;
     padding: 0.8rem 2rem;
     font-size: 1rem;
