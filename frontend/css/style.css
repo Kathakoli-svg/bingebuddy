@@ -146,6 +146,16 @@ body {
 .welcome-btn:active {
   transform: none;
 }
+.tagline {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeUp 0.8s ease-out 0.2s both;
+}
 
 /* ── Auth ────────────────────────────────────────────────── */
 .auth-screen {
